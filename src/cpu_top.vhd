@@ -112,8 +112,12 @@ begin
 
 							L_CYC   <= '0';
 							L_STB   <= '0';
-							L_STATE <= "00";
+							L_STATE <= "10";
 						end if;
+					end if;
+				when "10" =>
+					if (L_CORE = '0') then
+						L_STATE <= "00";
 					end if;
 				when others => null;
 			end case;
