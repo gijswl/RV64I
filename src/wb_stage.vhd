@@ -8,13 +8,14 @@ use work.constants.all;
 
 entity wb_stage is
 	port(
-		I_CLK : in  std_logic;
-		I_RST : in  std_logic;
-		I_WB  : in  std_logic_vector(XLEN - 1 downto 0);
-		I_CS  : in  std_logic_vector(CS_SIZE - 1 downto 0);
-		Q_WD  : out std_logic_vector(XLEN - 1 downto 0);
-		Q_WA  : out std_logic_vector(4 downto 0);
-		Q_WR  : out std_logic
+		I_CLK   : in  std_logic;
+		I_RST   : in  std_logic;
+		I_STALL : in  std_logic;
+		I_WB    : in  std_logic_vector(XLEN - 1 downto 0);
+		I_CS    : in  std_logic_vector(CS_SIZE - 1 downto 0);
+		Q_WD    : out std_logic_vector(XLEN - 1 downto 0);
+		Q_WA    : out std_logic_vector(4 downto 0);
+		Q_WR    : out std_logic
 	);
 end entity wb_stage;
 
@@ -31,6 +32,8 @@ architecture RTL of wb_stage is
 		);
 	end component reg;
 
+	signal L_NOSTALL : std_logic;
+
 	signal L_WB : std_logic_vector(XLEN - 1 downto 0);
 	signal L_CS : std_logic_vector(CS_SIZE - 1 downto 0);
 begin
@@ -41,7 +44,7 @@ begin
 		port map(
 			I_CLK => I_CLK,
 			I_D   => I_WB,
-			I_W   => '1',
+			I_W   => L_NOSTALL,
 			Q_D   => L_WB
 		);
 	cs : reg
@@ -51,9 +54,11 @@ begin
 		port map(
 			I_CLK => I_CLK,
 			I_D   => I_CS,
-			I_W   => '1',
+			I_W   => L_NOSTALL,
 			Q_D   => L_CS
 		);
+
+	L_NOSTALL <= not I_STALL;
 
 	Q_WD <= L_WB;
 	Q_WA <= L_CS(CS_RD'range);

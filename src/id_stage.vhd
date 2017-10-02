@@ -165,7 +165,7 @@ begin
 		"00100" when "0111",
 		"00000" when others;
 
-	L_INSTR_FUNC <= "00010" when (L_TYPE(5) = '1' or L_TYPE(13) = '1' or L_TYPE(25) = '1' or L_TYPE(27) = '1') -- ADD
+	L_INSTR_FUNC <= "00010" when (L_TYPE(0) = '1' or L_TYPE(5) = '1' or L_TYPE(8) = '1' or L_TYPE(13) = '1' or L_TYPE(25) = '1' or L_TYPE(27) = '1') -- ADD
 		else "00011" when (L_TYPE(24) = '1' and (not L_FUNC = "0110" and not L_FUNC = "0111")) -- SUBS
 		else "00101" when (L_TYPE(28) = '1' and L_IR(13 downto 12) = "10") -- OR
 		else "01010" when L_TYPE(24) = '1' -- SUBU

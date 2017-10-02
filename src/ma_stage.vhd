@@ -208,8 +208,8 @@ begin
 
 	C_CLK <= not I_CLK;
 
-	C_RE <= '1' when L_CS(CS_LD'range) = "1" else '0';
-	C_WE <= '1' when L_CS(CS_ST'range) = "1" else '0';
+	C_RE <= '1' when L_CS(CS_LD'range) = "1" and C_RDY = '1' else '0';
+	C_WE <= '1' when L_CS(CS_ST'range) = "1" and C_RDY = '1' else '0';
 
 	L_NS <= C_RDY;
 
