@@ -119,6 +119,8 @@ begin
 							L_STB   <= '0';
 							L_STATE <= "10";
 						elsif (I_ERR = '1') then
+							C0_MIN <= I_DAT;
+
 							L_CYC   <= '0';
 							L_STB   <= '0';
 							L_STATE <= "10";

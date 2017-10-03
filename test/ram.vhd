@@ -103,6 +103,7 @@ begin
 				L_STATE <= "11";
 			elsif (L_STATE = "10") then
 				L_ERR <= '1';
+				L_DATO <= X"0000000000000001";
 
 				L_STATE <= "11";
 			elsif (L_STATE = "11") then

@@ -64,6 +64,10 @@ architecture RTL of ex_stage is
 			I_CLK    : in  std_logic;
 			I_RST    : in  std_logic;
 			I_WR     : in  std_logic;
+			I_INT    : in  std_logic;
+			I_EXC    : in  std_logic;
+			I_CAUSE  : in  std_logic_vector(3 downto 0);
+			I_EPC    : in  std_logic_vector(XLEN - 1 downto 0);
 			I_CSRSEL : in  std_logic_vector(11 downto 0);
 			I_CSRDAT : in  std_logic_vector(XLEN - 1 downto 0);
 			I_PC     : in  std_logic_vector(XLEN - 1 downto 0);
@@ -172,6 +176,10 @@ begin
 			I_CLK    => I_CLK,
 			I_RST    => I_RST,
 			I_WR     => L_CSR_WR,
+			I_INT    => '0',
+			I_EXC    => '0',
+			I_CAUSE  => "0000",
+			I_EPC    => X"0000000000000000",
 			I_CSRSEL => L_C(11 downto 0),
 			I_CSRDAT => L_OUT,
 			I_PC     => L_PC,

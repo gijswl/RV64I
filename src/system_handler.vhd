@@ -17,6 +17,10 @@ entity system_handler is
 		I_CLK    : in  std_logic;
 		I_RST    : in  std_logic;
 		I_WR     : in  std_logic;
+		I_INT    : in  std_logic;
+		I_EXC    : in  std_logic;
+		I_CAUSE  : in  std_logic_vector(3 downto 0);
+		I_EPC    : in  std_logic_vector(XLEN - 1 downto 0);
 		I_CSRSEL : in  std_logic_vector(11 downto 0);
 		I_CSRDAT : in  std_logic_vector(XLEN - 1 downto 0);
 		I_PC     : in  std_logic_vector(XLEN - 1 downto 0);
@@ -87,7 +91,25 @@ begin
 			MSTATUS(CSR_MSTATUS_MIE'range)  <= "0";
 			MSTATUS(CSR_MSTATUS_MPRV'range) <= "0";
 		elsif (falling_edge(I_CLK)) then
-			if (I_CS(CS_ILL'range) = "1") then
+			if (I_EXC = '1') then
+				MSTATUS(CSR_MSTATUS_MPIE'range) <= MSTATUS(CSR_MSTATUS_MIE'range);
+				MSTATUS(CSR_MSTATUS_MIE'range)  <= "0";
+				MEPC                            <= I_EPC;
+				MCAUSE(3 downto 0)              <= I_CAUSE;
+				MCAUSE(XLEN - 1 downto 4)       <= X"00000000000000" & "0000";
+
+				L_PC    <= MTVEC(XLEN - 1 downto 2) & "00";
+				L_SELPC <= '1';
+			elsif (I_INT = '1') then
+				MSTATUS(CSR_MSTATUS_MPIE'range) <= MSTATUS(CSR_MSTATUS_MIE'range);
+				MSTATUS(CSR_MSTATUS_MIE'range)  <= "0";
+				MEPC                            <= I_EPC;
+				MCAUSE(3 downto 0)              <= I_CAUSE;
+				MCAUSE(XLEN - 1 downto 4)       <= X"80000000000000" & "0000";
+
+				L_PC    <= MTVEC(XLEN - 1 downto 2) & "00";
+				L_SELPC <= '1';
+			elsif (I_CS(CS_ILL'range) = "1") then
 				--report "Illegal instruction" severity note;
 				MSTATUS(CSR_MSTATUS_MPIE'range) <= MSTATUS(CSR_MSTATUS_MIE'range);
 				MSTATUS(CSR_MSTATUS_MIE'range)  <= "0";
