@@ -118,6 +118,10 @@ begin
 							L_CYC   <= '0';
 							L_STB   <= '0';
 							L_STATE <= "10";
+						elsif (I_ERR = '1') then
+							L_CYC   <= '0';
+							L_STB   <= '0';
+							L_STATE <= "10";
 						end if;
 					end if;
 				when "10" =>

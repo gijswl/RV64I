@@ -89,18 +89,26 @@ begin
 				if (I_CYC = '1' and I_STB = '1') then
 					if (I_WE = '0') then
 						L_IADR <= to_integer(unsigned(I_ADR(ADR_WIDTH - 1 downto 3)));
-
-						L_STATE <= "01";
+						if (I_ADR > RAM_SIZE - 1) then
+							L_STATE <= "10";
+						else
+							L_STATE <= "01";
+						end if;
 					end if;
 				end if;
 			elsif (L_STATE = "01") then
 				L_DATO <= mem(L_IADR);
 				L_ACK  <= '1';
-		
-				L_STATE <= "10";
+
+				L_STATE <= "11";
 			elsif (L_STATE = "10") then
+				L_ERR <= '1';
+
+				L_STATE <= "11";
+			elsif (L_STATE = "11") then
 				if (I_CYC = '0' and I_STB = '0') then
 					L_ACK   <= '0';
+					L_ERR   <= '0';
 					L_STATE <= "00";
 				end if;
 			end if;
