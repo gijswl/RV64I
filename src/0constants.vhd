@@ -99,6 +99,9 @@ package constants is
 	constant MCAUSE_IPAGE_FAULT      : std_logic_vector(XLEN - 1 downto 0) := X"000000000000000C";
 	constant MCAUSE_LPAGE_FAULT      : std_logic_vector(XLEN - 1 downto 0) := X"000000000000000D";
 	constant MCAUSE_SPAGE_FAULT      : std_logic_vector(XLEN - 1 downto 0) := X"000000000000000F";
+	
+	-- Exception sources
+	constant SOURCE_MEM : std_logic_vector(XLEN -2 downto 0) := "000" & X"000000000000001"; 
 end package constants;
 
 package body constants is

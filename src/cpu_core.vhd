@@ -11,6 +11,7 @@ entity cpu_core is
 		I_CLK   : in  std_logic;
 		I_RST   : in  std_logic;
 		I_MRDY  : in  std_logic;
+		I_INT   : in  std_logic;
 		I_MIN   : in  std_logic_vector(XLEN - 1 downto 0);
 		Q_MADDR : out std_logic_vector(XLEN - 1 downto 0);
 		Q_MOUT  : out std_logic_vector(XLEN - 1 downto 0);
@@ -67,6 +68,10 @@ architecture RTL of cpu_core is
 			I_CLK      : in  std_logic;
 			I_RST      : in  std_logic;
 			I_STALL    : in  std_logic;
+			I_INT      : in  std_logic;
+			I_EXC      : in  std_logic;
+			I_CAUSE    : in  std_logic_vector(3 downto 0);
+			I_EPC      : in  std_logic_vector(XLEN - 1 downto 0);
 			I_FW_A     : in  std_logic_vector(1 downto 0);
 			I_FW_B     : in  std_logic_vector(1 downto 0);
 			I_MA_FW    : in  std_logic_vector(XLEN - 1 downto 0);
@@ -83,6 +88,11 @@ architecture RTL of cpu_core is
 			Q_SELT     : out std_logic
 		);
 	end component ex_stage;
+
+	signal EX_INT   : std_logic;
+	signal EX_EXC   : std_logic;
+	signal EX_CAUSE : std_logic_vector(3 downto 0);
+	signal EX_EPC   : std_logic_vector(XLEN - 1 downto 0);
 
 	signal EX_PC : std_logic_vector(XLEN - 1 downto 0);
 	signal EX_MA : std_logic_vector(XLEN - 1 downto 0);
@@ -104,6 +114,7 @@ architecture RTL of cpu_core is
 			Q_WB    : out std_logic_vector(XLEN - 1 downto 0);
 			Q_MADDR : out std_logic_vector(XLEN - 1 downto 0);
 			Q_MOUT  : out std_logic_vector(XLEN - 1 downto 0);
+			Q_PC    : out std_logic_vector(XLEN - 1 downto 0);
 			Q_MWE   : out std_logic;
 			Q_MRE   : out std_logic;
 			Q_STALL : out std_logic
@@ -112,6 +123,7 @@ architecture RTL of cpu_core is
 
 	signal MA_WB : std_logic_vector(XLEN - 1 downto 0);
 	signal MA_CS : std_logic_vector(CS_SIZE - 1 downto 0);
+	signal MA_PC : std_logic_vector(XLEN - 1 downto 0);
 
 	signal MA_MRDY  : std_logic;
 	signal MA_MWE   : std_logic;
@@ -144,6 +156,8 @@ architecture RTL of cpu_core is
 	signal L_FC   : std_logic_vector(FC_SIZE - 1 downto 0);
 	signal L_FW_A : std_logic_vector(1 downto 0);
 	signal L_FW_B : std_logic_vector(1 downto 0);
+
+	signal L_MEM : std_logic_vector(1 downto 0);
 
 	signal L_STALL : std_logic := '0';
 begin
@@ -182,6 +196,10 @@ begin
 			I_CLK      => I_CLK,
 			I_RST      => I_RST,
 			I_STALL    => L_STALL,
+			I_INT      => EX_INT,
+			I_EXC      => EX_EXC,
+			I_CAUSE    => EX_CAUSE,
+			I_EPC      => EX_EPC,
 			I_FW_A     => L_FW_A,
 			I_FW_B     => L_FW_B,
 			I_MA_FW    => MA_WB,
@@ -213,6 +231,7 @@ begin
 			Q_WB    => MA_WB,
 			Q_MADDR => MA_MADDR,
 			Q_MOUT  => MA_MOUT,
+			Q_PC    => MA_PC,
 			Q_MWE   => MA_MWE,
 			Q_MRE   => MA_MRE,
 			Q_STALL => L_STALL
@@ -245,8 +264,30 @@ begin
 		)
 		else FW_NO;
 
+	EX_INT   <= '0';
+	EX_EXC   <= '1' when I_INT = '1' and I_MIN(XLEN - 1) = '1' else '0';
+	EX_CAUSE <= "0101" when (EX_EXC = '1' and L_MEM = "10" and I_MIN(XLEN - 2 downto 0) = SOURCE_MEM)
+		else "0111" when (EX_EXC = '1' and L_MEM = "01" and I_MIN(XLEN - 2 downto 0) = SOURCE_MEM)
+		else "ZZZZ";
+	EX_EPC   <= MA_PC when (EX_EXC = '1' and (EX_CAUSE = "0101" or EX_CAUSE = "0111")) else (others => 'Z');
+
 	MA_MRDY <= I_MRDY;
 	MA_MIN  <= I_MIN;
+
+	process(MA_MWE, MA_MRE, MA_MRDY)
+	begin
+		if (rising_edge(MA_MWE)) then
+			L_MEM <= "01";
+		end if;
+
+		if (rising_edge(MA_MRE)) then
+			L_MEM <= "10";
+		end if;
+
+		if (rising_edge(MA_MRDY)) then
+			L_MEM <= "00";
+		end if;
+	end process;
 
 	Q_MMASK <= MA_MMASK;
 	Q_MOUT  <= MA_MOUT;
