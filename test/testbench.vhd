@@ -102,7 +102,7 @@ begin
 			Q_TGC => L_TGC,
 			Q_CYC => L_CYC,
 			Q_LCK => L_LCK,
-			Q_STB => L_LCK,
+			Q_STB => L_STB,
 			Q_WE  => L_WE
 		);
 

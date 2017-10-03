@@ -91,6 +91,11 @@ begin
 					C0_MRDY <= '0';
 					C0_MIN  <= (others => 'Z');
 
+					L_ADR <= (others => 'Z');
+					L_CYC <= '0';
+					L_STB <= '0';
+					L_WE  <= '0';
+
 					if (C0_MRE = '1') then
 						L_ADR <= C0_MADDR;
 						L_WE  <= '0';
