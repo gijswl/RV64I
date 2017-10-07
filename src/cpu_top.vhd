@@ -34,7 +34,6 @@ architecture RTL of cpu_top is
 			I_CLK   : in  std_logic;
 			I_RST   : in  std_logic;
 			I_MRDY  : in  std_logic;
-			I_INT   : in  std_logic;
 			I_MIN   : in  std_logic_vector(XLEN - 1 downto 0);
 			Q_MADDR : out std_logic_vector(XLEN - 1 downto 0);
 			Q_MOUT  : out std_logic_vector(XLEN - 1 downto 0);
@@ -47,7 +46,6 @@ architecture RTL of cpu_top is
 	signal C0_MRDY  : std_logic;
 	signal C0_MRE   : std_logic;
 	signal C0_MWE   : std_logic;
-	signal C0_INT   : std_logic;
 	signal C0_MIN   : std_logic_vector(XLEN - 1 downto 0);
 	signal C0_MADDR : std_logic_vector(XLEN - 1 downto 0);
 	signal C0_MOUT  : std_logic_vector(XLEN - 1 downto 0);
@@ -74,7 +72,6 @@ begin
 			I_CLK   => I_CLK,
 			I_RST   => I_RST,
 			I_MRDY  => C0_MRDY,
-			I_INT   => C0_INT,
 			I_MIN   => C0_MIN,
 			Q_MADDR => C0_MADDR,
 			Q_MOUT  => C0_MOUT,
@@ -91,7 +88,6 @@ begin
 		elsif (rising_edge(I_CLK)) then
 			case L_STATE is
 				when "00" =>
-					C0_INT  <= '0';
 					C0_MRDY <= '0';
 					C0_MIN  <= (others => 'Z');
 
@@ -123,8 +119,7 @@ begin
 							L_STB   <= '0';
 							L_STATE <= "10";
 						elsif (I_ERR = '1') then
-							C0_INT <= '1';
-							C0_MIN <= X"8000000000000001";
+							C0_MIN <= I_DAT;
 
 							L_CYC   <= '0';
 							L_STB   <= '0';
@@ -133,7 +128,6 @@ begin
 					end if;
 				when "10" =>
 					if (L_CORE = '0') then
-						C0_INT  <= '0';
 						L_STATE <= "00";
 					end if;
 				when others => null;

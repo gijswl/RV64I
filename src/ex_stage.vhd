@@ -11,10 +11,6 @@ entity ex_stage is
 		I_CLK      : in  std_logic;
 		I_RST      : in  std_logic;
 		I_STALL    : in  std_logic;
-		I_INT      : in  std_logic;
-		I_EXC      : in  std_logic;
-		I_CAUSE    : in  std_logic_vector(3 downto 0);
-		I_EPC      : in  std_logic_vector(XLEN - 1 downto 0);
 		I_FW_A     : in  std_logic_vector(1 downto 0);
 		I_FW_B     : in  std_logic_vector(1 downto 0);
 		I_MA_FW    : in  std_logic_vector(XLEN - 1 downto 0);
@@ -81,11 +77,6 @@ architecture RTL of ex_stage is
 			Q_SELPC  : out std_logic
 		);
 	end component system_handler;
-
-	signal SYS_INT   : std_logic;
-	signal SYS_EXC   : std_logic;
-	signal SYS_CAUSE : std_logic_vector(3 downto 0);
-	signal SYS_EPC   : std_logic_vector(XLEN - 1 downto 0);
 
 	signal L_NS : std_logic;
 	signal L_A  : std_logic_vector(XLEN - 1 downto 0);
@@ -185,10 +176,10 @@ begin
 			I_CLK    => I_CLK,
 			I_RST    => I_RST,
 			I_WR     => L_CSR_WR,
-			I_INT    => SYS_INT,
-			I_EXC    => SYS_EXC,
-			I_CAUSE  => SYS_CAUSE,
-			I_EPC    => SYS_EPC,
+			I_INT    => '0',
+			I_EXC    => '0',
+			I_CAUSE  => "0000",
+			I_EPC    => X"0000000000000000",
 			I_CSRSEL => L_C(11 downto 0),
 			I_CSRDAT => L_OUT,
 			I_PC     => L_PC,
@@ -221,11 +212,6 @@ begin
 	L_BT <= '1' when L_CS(CS_BJ'range) = "10" and (
 		(L_CS(CS_FC'range) = "000" and L_CC(0) = '1') or (L_CS(CS_FC'range) = "001" and L_CC(0) = '0') or ((L_CS(CS_FC'range) = "101" or L_CS(CS_FC'range) = "111") and (L_CC(1) = '0' and L_CC(2) = '0')) or ((L_CS(CS_FC'range) = "100" or L_CS(CS_FC'range) = "110") and (L_CC(1) = '1' and L_CC(2) = '1'))
 	) else '0';
-
-	SYS_INT   <= I_INT;
-	SYS_EXC   <= I_EXC;
-	SYS_CAUSE <= I_CAUSE(3 downto 0);
-	SYS_EPC   <= I_EPC;
 
 	Q_PC       <= L_PC;
 	Q_MA       <= L_OUT;

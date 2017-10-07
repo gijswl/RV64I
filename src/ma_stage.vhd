@@ -21,7 +21,6 @@ entity ma_stage is
 		Q_WB    : out std_logic_vector(XLEN - 1 downto 0);
 		Q_MADDR : out std_logic_vector(XLEN - 1 downto 0);
 		Q_MOUT  : out std_logic_vector(XLEN - 1 downto 0);
-		Q_PC    : out std_logic_vector(XLEN - 1 downto 0);
 		Q_MWE   : out std_logic;
 		Q_MRE   : out std_logic;
 		Q_STALL : out std_logic
@@ -214,7 +213,6 @@ begin
 
 	L_NS <= C_RDY;
 
-	Q_PC    <= L_PC;
-	Q_STALL <= not C_RDY; -- TODO abort on error
+	Q_STALL <= not C_RDY;
 	Q_CS    <= (others => '0') when C_RDY = '0' else L_CS;
 end architecture RTL;
