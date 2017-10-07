@@ -137,14 +137,14 @@ begin
 			re     => C_RE,
 			we     => C_WE,
 			mask   => C_MASK,
-			min    => I_MIN,
-			mready => I_MRDY,
+			min    => C_MIN,
+			mready => C_MRDY,
 			dout   => C_DOUT,
 			ready  => C_RDY,
 			maddr  => Q_MADDR,
 			mout   => Q_MOUT,
-			mre    => Q_MRE,
-			mwe    => Q_MWE,
+			mre    => C_MRE,
+			mwe    => C_MWE,
 			mmask  => Q_MMASK
 		);
 
@@ -213,6 +213,12 @@ begin
 
 	L_NS <= C_RDY;
 
+	C_MRDY <= I_MRDY;
+	C_MIN <= I_MIN;
+
 	Q_STALL <= not C_RDY;
 	Q_CS    <= (others => '0') when C_RDY = '0' else L_CS;
+
+	Q_MRE <= C_MRE;
+	Q_MWE <= C_MWE;
 end architecture RTL;

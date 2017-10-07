@@ -46,7 +46,7 @@ architecture RTL of testbench is
 			I_WE    : in  std_logic;
 			I_TGA   : in  std_logic;    -- TODO
 			I_TGC   : in  std_logic;    -- TODO
-			I_SEL   : in  std_logic_vector((ADR_WIDTH / 8) - 1 downto 0);
+			I_SEL   : in  std_logic_vector((DATA_WIDTH / 8) - 1 downto 0);
 			I_DAT   : in  std_logic_vector(DATA_WIDTH - 1 downto 0);
 			I_ADR   : in  std_logic_vector(ADR_WIDTH - 1 downto 0);
 			Q_DAT   : out std_logic_vector(DATA_WIDTH - 1 downto 0);
@@ -97,6 +97,7 @@ begin
 			I_DAT => L_DATI,
 			Q_DAT => L_DATO,
 			Q_ADR => L_ADR,
+			Q_SEL => L_SEL,
 			Q_TGD => L_TGDO,
 			Q_TGA => L_TGA,
 			Q_TGC => L_TGC,
@@ -129,7 +130,7 @@ begin
 			Q_DAT   => L_DATI,
 			Q_TGD   => L_TGDI,
 			Q_ACK   => L_ACK,
-			Q_STALL => open,
+			Q_STALL => L_STL,
 			Q_ERR   => L_ERR,
 			Q_RTY   => L_RTY
 		);

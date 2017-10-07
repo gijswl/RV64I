@@ -69,6 +69,7 @@ architecture RTL of cpu_core is
 			I_STALL    : in  std_logic;
 			I_FW_A     : in  std_logic_vector(1 downto 0);
 			I_FW_B     : in  std_logic_vector(1 downto 0);
+			I_FW_C     : in  std_logic_vector(1 downto 0);
 			I_MA_FW    : in  std_logic_vector(XLEN - 1 downto 0);
 			I_A        : in  std_logic_vector(XLEN - 1 downto 0);
 			I_B        : in  std_logic_vector(XLEN - 1 downto 0);
@@ -144,6 +145,7 @@ architecture RTL of cpu_core is
 	signal L_FC   : std_logic_vector(FC_SIZE - 1 downto 0);
 	signal L_FW_A : std_logic_vector(1 downto 0);
 	signal L_FW_B : std_logic_vector(1 downto 0);
+	signal L_FW_C : std_logic_vector(1 downto 0);
 
 	signal L_STALL : std_logic := '0';
 begin
@@ -184,6 +186,7 @@ begin
 			I_STALL    => L_STALL,
 			I_FW_A     => L_FW_A,
 			I_FW_B     => L_FW_B,
+			I_FW_C     => L_FW_C,
 			I_MA_FW    => MA_WB,
 			I_A        => ID_A,
 			I_B        => ID_B,
@@ -242,6 +245,13 @@ begin
 		)
 		else FW_MA when (
 			((L_FC(FC_RS2'range) = MA_CS(CS_RD'range)) and (MA_CS(CS_WE'range) = "1" and not (MA_CS(CS_RD'range) = "00000")) and L_FC(FC_RB'range) = "1")
+		)
+		else FW_NO;
+	L_FW_C <= FW_EX when (
+			((L_FC(FC_RS2'range) = EX_CS(CS_RD'range)) and (EX_CS(CS_WE'range) = "1" and not (EX_CS(CS_RD'range) = "00000")) and L_FC(FC_RC'range) = "1")
+		)
+		else FW_MA when (
+			((L_FC(FC_RS2'range) = MA_CS(CS_RD'range)) and (MA_CS(CS_WE'range) = "1" and not (MA_CS(CS_RD'range) = "00000")) and L_FC(FC_RC'range) = "1")
 		)
 		else FW_NO;
 

@@ -85,16 +85,22 @@ begin
 		if (I_RST = '1') then
 			L_STATE <= "00";
 			L_CORE  <= '0';
-		elsif (rising_edge(I_CLK)) then
+		elsif (falling_edge(I_CLK)) then
 			case L_STATE is
 				when "00" =>
 					C0_MRDY <= '0';
 					C0_MIN  <= (others => 'Z');
 
-					L_ADR <= (others => 'Z');
-					L_CYC <= '0';
-					L_STB <= '0';
-					L_WE  <= '0';
+					L_ADR  <= (others => 'Z');
+					L_DATO <= (others => 'Z');
+					L_CYC  <= '0';
+					L_STB  <= '0';
+					L_LCK  <= '0';
+					L_WE   <= '0';
+
+					L_TGD <= '0';
+					L_TGA <= '0';
+					L_TGC <= '0';
 
 					if (C0_MRE = '1') then
 						L_ADR <= C0_MADDR;
@@ -108,6 +114,20 @@ begin
 
 						L_CORE  <= '0';
 						L_STATE <= "01";
+					elsif (C0_MWE = '1') then
+						L_ADR  <= C0_MADDR;
+						L_DATO <= C0_MOUT;
+						L_WE   <= '1';
+						L_SEL  <= C0_MMASK;
+						L_CYC  <= '1';
+						L_STB  <= '1';
+
+						L_TGA <= '0';
+						L_TGD <= '0';
+						L_TGC <= '0';
+
+						L_CORE  <= '0';
+						L_STATE <= "11";
 					end if;
 				when "01" =>
 					if (L_CORE = '0') then
@@ -120,7 +140,8 @@ begin
 							L_STATE <= "10";
 						elsif (I_ERR = '1') then
 							C0_MIN <= I_DAT;
-
+							report "WB_ERR: read" severity failure;
+							
 							L_CYC   <= '0';
 							L_STB   <= '0';
 							L_STATE <= "10";
@@ -128,7 +149,26 @@ begin
 					end if;
 				when "10" =>
 					if (L_CORE = '0') then
-						L_STATE <= "00";
+						C0_MRDY <= '0';
+					end if;
+
+					L_STATE <= "00";
+				when "11" =>
+					if (L_CORE = '0') then
+						if (I_ACK = '1') then
+							C0_MRDY <= '1';
+							L_CYC   <= '0';
+							L_STB   <= '0';
+							L_WE    <= '0';
+							L_STATE <= "10";
+						elsif (I_ERR = '1') then
+							report "WB_ERR: write" severity failure;
+							
+							L_CYC   <= '0';
+							L_STB   <= '0';
+							L_WE    <= '0';
+							L_STATE <= "10";
+						end if;
 					end if;
 				when others => null;
 			end case;

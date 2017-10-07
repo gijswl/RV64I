@@ -13,6 +13,7 @@ entity ex_stage is
 		I_STALL    : in  std_logic;
 		I_FW_A     : in  std_logic_vector(1 downto 0);
 		I_FW_B     : in  std_logic_vector(1 downto 0);
+		I_FW_C     : in  std_logic_vector(1 downto 0);
 		I_MA_FW    : in  std_logic_vector(XLEN - 1 downto 0);
 		I_A        : in  std_logic_vector(XLEN - 1 downto 0);
 		I_B        : in  std_logic_vector(XLEN - 1 downto 0);
@@ -89,6 +90,7 @@ architecture RTL of ex_stage is
 	signal ALU_B : std_logic_vector(XLEN - 1 downto 0);
 	signal L_IA  : std_logic_vector(XLEN - 1 downto 0);
 	signal L_IB  : std_logic_vector(XLEN - 1 downto 0);
+	signal L_IC  : std_logic_vector(XLEN - 1 downto 0);
 
 	signal L_BT  : std_logic;
 	signal L_SZ  : std_logic;
@@ -129,7 +131,7 @@ begin
 		)
 		port map(
 			I_CLK => I_CLK,
-			I_D   => I_C,
+			I_D   => L_IC,
 			I_W   => L_NS,
 			Q_D   => L_C
 		);
@@ -200,6 +202,10 @@ begin
 		else L_OUT when I_FW_B = FW_EX
 		else I_MA_FW when I_FW_B = FW_MA
 	;
+	L_IC <= I_C when I_FW_C = FW_NO
+		else L_OUT when I_FW_C = FW_EX
+		else I_MA_FW when I_FW_C = FW_MA
+	;
 
 	L_PRIV   <= '1' when (L_CS(CS_SY'range) = "1" and L_CS(CS_FC'range) = "000") else '0';
 	L_CSR    <= '1' when (L_CS(CS_SY'range) = "1" and (L_PRIV = '0' and L_CS(CS_FC'left) = '0')) else '0';
@@ -219,6 +225,6 @@ begin
 	Q_CS       <= (others => '0') when L_SELSYSPC = '1' or I_RST = '1' else L_CS;
 	Q_SELT     <= '1' when (L_BT = '1' or L_CS(CS_BJ'range) = "01" or L_SELSYSPC = '1') else '0';
 	Q_PCTARGET <= L_SYSPC when L_SELSYSPC = '1'
-		else (L_PC + L_C) when L_CS(CS_BJ'range) = "10"
+		else (L_PC + L_IC) when L_CS(CS_BJ'range) = "10"
 		else L_OUT;
 end architecture RTL;
