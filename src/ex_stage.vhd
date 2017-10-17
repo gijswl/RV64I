@@ -11,6 +11,7 @@ entity ex_stage is
 		I_CLK      : in  std_logic;
 		I_RST      : in  std_logic;
 		I_STALL    : in  std_logic;
+		I_KILL     : in  std_logic;
 		I_FW_A     : in  std_logic_vector(1 downto 0);
 		I_FW_B     : in  std_logic_vector(1 downto 0);
 		I_FW_C     : in  std_logic_vector(1 downto 0);
@@ -25,7 +26,8 @@ entity ex_stage is
 		Q_MA       : out std_logic_vector(XLEN - 1 downto 0);
 		Q_MD       : out std_logic_vector(XLEN - 1 downto 0);
 		Q_PCTARGET : out std_logic_vector(XLEN - 1 downto 0);
-		Q_SELT     : out std_logic
+		Q_SELT     : out std_logic;
+		Q_KILL     : out std_logic
 	);
 end entity ex_stage;
 
@@ -41,6 +43,19 @@ architecture RTL of ex_stage is
 			Q_D   : out std_logic_vector(width - 1 downto 0)
 		);
 	end component reg;
+
+	component reg_rst is
+		generic(
+			width : natural
+		);
+		port(
+			I_CLK : in  std_logic;
+			I_RST : in  std_logic;
+			I_W   : in  std_logic;
+			I_D   : in  std_logic_vector(width - 1 downto 0);
+			Q_D   : out std_logic_vector(width - 1 downto 0)
+		);
+	end component reg_rst;
 
 	component alu is
 		port(
@@ -97,6 +112,11 @@ architecture RTL of ex_stage is
 	signal L_CC  : std_logic_vector(2 downto 0);
 	signal L_OUT : std_logic_vector(XLEN - 1 downto 0);
 
+	signal L_IEXC  : std_logic;
+	signal L_EEXC  : std_logic := '0';
+	signal L_EXC   : std_logic;
+	signal L_CAUSE : std_logic_vector(3 downto 0);
+
 	signal L_PRIV     : std_logic;
 	signal L_CSR      : std_logic;
 	signal L_CSRI     : std_logic;
@@ -145,13 +165,14 @@ begin
 			I_W   => L_NS,
 			Q_D   => L_PC
 		);
-	cs : reg
+	cs : reg_rst
 		generic map(
 			width => CS_SIZE
 		)
 		port map(
 			I_CLK => I_CLK,
 			I_D   => I_CS,
+			I_RST => I_KILL,
 			I_W   => L_NS,
 			Q_D   => L_CS
 		);
@@ -179,9 +200,9 @@ begin
 			I_RST    => I_RST,
 			I_WR     => L_CSR_WR,
 			I_INT    => '0',
-			I_EXC    => '0',
-			I_CAUSE  => "0000",
-			I_EPC    => X"0000000000000000",
+			I_EXC    => L_EXC,
+			I_CAUSE  => L_CAUSE,
+			I_EPC    => I_PC,
 			I_CSRSEL => L_C(11 downto 0),
 			I_CSRDAT => L_OUT,
 			I_PC     => L_PC,
@@ -219,10 +240,23 @@ begin
 		(L_CS(CS_FC'range) = "000" and L_CC(0) = '1') or (L_CS(CS_FC'range) = "001" and L_CC(0) = '0') or ((L_CS(CS_FC'range) = "101" or L_CS(CS_FC'range) = "111") and (L_CC(1) = '0' and L_CC(2) = '0')) or ((L_CS(CS_FC'range) = "100" or L_CS(CS_FC'range) = "110") and (L_CC(1) = '1' and L_CC(2) = '1'))
 	) else '0';
 
+	L_IEXC <= '1' when (
+		(L_OUT(2 downto 0) /= "000" and (L_CS(CS_LD'range) = "1" or L_CS(CS_ST'range) = "1") and (L_CS(CS_FC'range) = "011" or L_CS(CS_FC'range) = "110")) or --
+		(L_OUT(1 downto 0) /= "00" and (L_CS(CS_LD'range) = "1" or L_CS(CS_ST'range) = "1") and (L_CS(CS_FC'range) = "010" or L_CS(CS_FC'range) = "101")) or --
+		(L_OUT(0) /= '0' and (L_CS(CS_LD'range) = "1" or L_CS(CS_ST'range) = "1") and (L_CS(CS_FC'range) = "001" or L_CS(CS_FC'range) = "100")) --
+	) else '0';
+
+	L_EXC <= L_IEXC or L_EEXC;
+
+	L_CAUSE <= "0100" when (L_IEXC = '1' and L_CS(CS_LD'range) = "1") -- Load address misaligned
+		else "0110" when (L_IEXC = '1' and L_CS(CS_ST'range) = "1") -- Store address misaligned
+		else "0000";
+
+	Q_KILL     <= L_IEXC;
 	Q_PC       <= L_PC;
 	Q_MA       <= L_OUT;
 	Q_MD       <= L_CSRO when L_CSR = '1' or L_CSRI = '1' else L_C;
-	Q_CS       <= (others => '0') when L_SELSYSPC = '1' or I_RST = '1' else L_CS;
+	Q_CS       <= (others => '0') when L_SELSYSPC = '1' or I_RST = '1' or L_IEXC = '1' else L_CS;
 	Q_SELT     <= '1' when (L_BT = '1' or L_CS(CS_BJ'range) = "01" or L_SELSYSPC = '1') else '0';
 	Q_PCTARGET <= L_SYSPC when L_SELSYSPC = '1'
 		else (L_PC + L_IC) when L_CS(CS_BJ'range) = "10"

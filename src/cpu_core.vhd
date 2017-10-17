@@ -27,6 +27,7 @@ architecture RTL of cpu_core is
 			I_RST    : in  std_logic;
 			I_SELT   : in  std_logic;
 			I_STALL  : in  std_logic;
+			I_KILL   : in  std_logic;
 			I_TARGET : in  std_logic_vector(XLEN - 1 downto 0);
 			Q_PC     : out std_logic_vector(XLEN - 1 downto 0);
 			Q_INSTR  : out std_logic_vector(32 downto 0)
@@ -67,6 +68,7 @@ architecture RTL of cpu_core is
 			I_CLK      : in  std_logic;
 			I_RST      : in  std_logic;
 			I_STALL    : in  std_logic;
+			I_KILL     : in  std_logic;
 			I_FW_A     : in  std_logic_vector(1 downto 0);
 			I_FW_B     : in  std_logic_vector(1 downto 0);
 			I_FW_C     : in  std_logic_vector(1 downto 0);
@@ -81,14 +83,16 @@ architecture RTL of cpu_core is
 			Q_MA       : out std_logic_vector(XLEN - 1 downto 0);
 			Q_MD       : out std_logic_vector(XLEN - 1 downto 0);
 			Q_PCTARGET : out std_logic_vector(XLEN - 1 downto 0);
-			Q_SELT     : out std_logic
+			Q_SELT     : out std_logic;
+			Q_KILL     : out std_logic
 		);
 	end component ex_stage;
 
-	signal EX_PC : std_logic_vector(XLEN - 1 downto 0);
-	signal EX_MA : std_logic_vector(XLEN - 1 downto 0);
-	signal EX_MD : std_logic_vector(XLEN - 1 downto 0);
-	signal EX_CS : std_logic_vector(CS_SIZE - 1 downto 0);
+	signal EX_PC   : std_logic_vector(XLEN - 1 downto 0);
+	signal EX_MA   : std_logic_vector(XLEN - 1 downto 0);
+	signal EX_MD   : std_logic_vector(XLEN - 1 downto 0);
+	signal EX_CS   : std_logic_vector(CS_SIZE - 1 downto 0);
+	signal EX_KILL : std_logic;
 
 	component ma_stage is
 		port(
@@ -147,7 +151,11 @@ architecture RTL of cpu_core is
 	signal L_FW_B : std_logic_vector(1 downto 0);
 	signal L_FW_C : std_logic_vector(1 downto 0);
 
-	signal L_STALL : std_logic := '0';
+	signal L_STALL  : std_logic := '0';
+	signal L_KILLIF : std_logic;
+	signal L_KILLID : std_logic;
+	signal L_KILLEX : std_logic;
+	signal L_KILLMA : std_logic;
 begin
 	stage_if : if_stage
 		port map(
@@ -155,6 +163,7 @@ begin
 			I_RST    => I_RST,
 			I_SELT   => L_SELT,
 			I_STALL  => L_STALL,
+			I_KILL   => L_KILLIF,
 			I_TARGET => L_PCTARGET,
 			Q_PC     => IF_PC,
 			Q_INSTR  => IF_INSTR
@@ -165,7 +174,7 @@ begin
 			I_CLK   => I_CLK,
 			I_RST   => I_RST,
 			I_STALL => L_STALL,
-			I_KILL  => L_SELT,
+			I_KILL  => L_KILLID,
 			I_WR    => WB_WR,
 			I_WA    => WB_WA,
 			I_INSTR => IF_INSTR,
@@ -184,6 +193,7 @@ begin
 			I_CLK      => I_CLK,
 			I_RST      => I_RST,
 			I_STALL    => L_STALL,
+			I_KILL     => L_KILLEX,
 			I_FW_A     => L_FW_A,
 			I_FW_B     => L_FW_B,
 			I_FW_C     => L_FW_C,
@@ -198,7 +208,8 @@ begin
 			Q_MA       => EX_MA,
 			Q_MD       => EX_MD,
 			Q_PCTARGET => L_PCTARGET,
-			Q_SELT     => L_SELT
+			Q_SELT     => L_SELT,
+			Q_KILL     => EX_KILL
 		);
 
 	stage_ma : ma_stage
@@ -257,6 +268,10 @@ begin
 
 	MA_MRDY <= I_MRDY;
 	MA_MIN  <= I_MIN;
+
+	L_KILLIF <= L_SELT or EX_KILL;
+	L_KILLID <= L_SELT or EX_KILL;
+	L_KILLEX <= EX_KILL;
 
 	Q_MMASK <= MA_MMASK;
 	Q_MOUT  <= MA_MOUT;

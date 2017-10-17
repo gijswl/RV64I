@@ -196,7 +196,7 @@ begin
 		L_MD when "11",                 -- CSR
 		L_MA when others;               -- ALU
 
-	with L_CS(CS_FC'range) select C_MASK <=
+	with L_CS(CS_FC'range) select C_MASK <= --TODO select mask based on address as well!
 		"00000001" when "000",          -- LB
 		"00000011" when "001",          -- LH
 		"00001111" when "010",          -- LW

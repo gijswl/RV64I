@@ -12,6 +12,7 @@ entity if_stage is
 		I_RST    : in  std_logic;
 		I_SELT   : in  std_logic;
 		I_STALL  : in  std_logic;
+		I_KILL   : in  std_logic;
 		I_TARGET : in  std_logic_vector(XLEN - 1 downto 0);
 		Q_PC     : out std_logic_vector(XLEN - 1 downto 0);
 		Q_INSTR  : out std_logic_vector(32 downto 0)
@@ -82,5 +83,5 @@ begin
 		else L_PC + "100";
 
 	Q_PC    <= (others => '0') when I_RST = '1' else L_PC;
-	Q_INSTR <= (others => '0') when (I_RST = '1' or C_STALL = '1' or I_SELT = '1') else '1' & L_CDATA;
+	Q_INSTR <= (others => '0') when (I_RST = '1' or C_STALL = '1' or I_KILL = '1') else '1' & L_CDATA;
 end architecture RTL;

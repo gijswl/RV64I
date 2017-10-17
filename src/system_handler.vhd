@@ -90,7 +90,10 @@ begin
 		if (I_RST = '1') then
 			MSTATUS(CSR_MSTATUS_MIE'range)  <= "0";
 			MSTATUS(CSR_MSTATUS_MPRV'range) <= "0";
-		elsif (falling_edge(I_CLK)) then
+		elsif (rising_edge(I_CLK)) then
+			L_PC    <= (others => '0');
+			L_SELPC <= '0';
+
 			if (I_EXC = '1') then
 				MSTATUS(CSR_MSTATUS_MPIE'range) <= MSTATUS(CSR_MSTATUS_MIE'range);
 				MSTATUS(CSR_MSTATUS_MIE'range)  <= "0";
@@ -109,7 +112,9 @@ begin
 
 				L_PC    <= MTVEC(XLEN - 1 downto 2) & "00";
 				L_SELPC <= '1';
-			elsif (I_CS(CS_ILL'range) = "1") then
+			end if;
+		elsif (falling_edge(I_CLK)) then
+			if (I_CS(CS_ILL'range) = "1") then
 				--report "Illegal instruction" severity note;
 				MSTATUS(CSR_MSTATUS_MPIE'range) <= MSTATUS(CSR_MSTATUS_MIE'range);
 				MSTATUS(CSR_MSTATUS_MIE'range)  <= "0";
@@ -181,9 +186,6 @@ begin
 						L_SELPC <= '1';
 				end case;
 			end if;
-		elsif (rising_edge(I_CLK)) then
-			L_PC    <= (others => '0');
-			L_SELPC <= '0';
 		end if;
 	end process;
 
