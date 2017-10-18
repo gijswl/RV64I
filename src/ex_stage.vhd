@@ -211,7 +211,7 @@ begin
 			Q_PC     => L_SYSPC,
 			Q_SELPC  => L_SELSYSPC
 		);
-
+        
 	L_NS <= not I_STALL;
 	L_SZ <= '1' when L_CS(CS_SZ'range) = "1" else '0';
 
@@ -240,12 +240,14 @@ begin
 		(L_CS(CS_FC'range) = "000" and L_CC(0) = '1') or (L_CS(CS_FC'range) = "001" and L_CC(0) = '0') or ((L_CS(CS_FC'range) = "101" or L_CS(CS_FC'range) = "111") and (L_CC(1) = '0' and L_CC(2) = '0')) or ((L_CS(CS_FC'range) = "100" or L_CS(CS_FC'range) = "110") and (L_CC(1) = '1' and L_CC(2) = '1'))
 	) else '0';
 
-	L_IEXC <= '1' when (
-		(L_OUT(2 downto 0) /= "000" and (L_CS(CS_LD'range) = "1" or L_CS(CS_ST'range) = "1") and (L_CS(CS_FC'range) = "011" or L_CS(CS_FC'range) = "110")) or --
-		(L_OUT(1 downto 0) /= "00" and (L_CS(CS_LD'range) = "1" or L_CS(CS_ST'range) = "1") and (L_CS(CS_FC'range) = "010" or L_CS(CS_FC'range) = "101")) or --
-		(L_OUT(0) /= '0' and (L_CS(CS_LD'range) = "1" or L_CS(CS_ST'range) = "1") and (L_CS(CS_FC'range) = "001" or L_CS(CS_FC'range) = "100")) --
-	) else '0';
-
+    L_IEXC <= '1' when (
+        (
+            (L_OUT(2 downto 0) /= "000" and (L_CS(CS_LD'range) = "1" or L_CS(CS_ST'range) = "1") and (L_CS(CS_FC'range) = "011" or L_CS(CS_FC'range) = "110")) or --
+            (L_OUT(1 downto 0) /= "00" and (L_CS(CS_LD'range) = "1" or L_CS(CS_ST'range) = "1") and (L_CS(CS_FC'range) = "010" or L_CS(CS_FC'range) = "101")) or --
+            (L_OUT(0) /= '0' and (L_CS(CS_LD'range) = "1" or L_CS(CS_ST'range) = "1") and (L_CS(CS_FC'range) = "001" or L_CS(CS_FC'range) = "100")) --
+        ) and I_CLK = '0'
+    ) else '0';   
+    
 	L_EXC <= L_IEXC or L_EEXC;
 
 	L_CAUSE <= "0100" when (L_IEXC = '1' and L_CS(CS_LD'range) = "1") -- Load address misaligned
