@@ -89,10 +89,10 @@ architecture RTL of ma_stage is
 		);
 	end component cache;
 
-    signal C_MA    : std_logic_vector(XLEN - 1 downto 0);
-    signal C_MD    : std_logic_vector(XLEN - 1 downto 0);
-    signal C_MASK  : std_logic_vector((XLEN / 8) - 1 downto 0);
-	signal C_SMASK  : std_logic_vector((XLEN / 8) - 1 downto 0);
+	signal C_MA    : std_logic_vector(XLEN - 1 downto 0);
+	signal C_MD    : std_logic_vector(XLEN - 1 downto 0);
+	signal C_MASK  : std_logic_vector((XLEN / 8) - 1 downto 0);
+	signal C_SMASK : std_logic_vector((XLEN / 8) - 1 downto 0);
 	signal C_RE    : std_logic;
 	signal C_WE    : std_logic;
 	signal C_DOUT  : std_logic_vector(XLEN - 1 downto 0);
@@ -114,7 +114,8 @@ architecture RTL of ma_stage is
 	signal L_MD : std_logic_vector(XLEN - 1 downto 0);
 	signal L_CS : std_logic_vector(CS_SIZE - 1 downto 0);
 
-	signal L_DT : std_logic_vector(XLEN - 1 downto 0) := (others => 'Z');
+	signal L_DOUT  : std_logic_vector(XLEN - 1 downto 0);
+	signal L_SDOUT : std_logic_vector(XLEN - 1 downto 0);
 begin
 	dcache : cache
 		generic map(
@@ -128,7 +129,7 @@ begin
 			-- 1: MRU
 			-- 2: FIFO
 			-- 3: PLRU
-			WRITE_POLICY    => 1
+			WRITE_POLICY    => 0
 			-- 0: write-back,    write-allocate
 			-- 1: write-through, write-around
 		)
@@ -193,13 +194,7 @@ begin
 			Q_D   => L_CS
 		);
 
-	with L_CS(CS_WB'range) select Q_WB <=
-		L_PC + "100" when "01",         -- PC + 4
-		C_DOUT when "10",               -- MEM
-		L_MD when "11",                 -- CSR
-		L_MA when others;               -- ALU
-
-	with L_CS(CS_FC'range) select C_MASK <= --TODO select mask based on address as well!
+	with L_CS(CS_FC'range) select C_MASK <=
 		"00000001" when "000",          -- LB
 		"00000011" when "001",          -- LH
 		"00001111" when "010",          -- LW
@@ -209,18 +204,41 @@ begin
 		"00001111" when "110",          -- LWU
 		"00000000" when others;
 
-    L_NS <= C_RDY;
-        
+	L_NS <= C_RDY;
+
 	C_CLK <= not I_CLK;
 
 	C_RE <= '1' when L_CS(CS_LD'range) = "1" and C_RDY = '1' else '0';
 	C_WE <= '1' when L_CS(CS_ST'range) = "1" and C_RDY = '1' else '0';
 
-    C_SMASK <= STD_LOGIC_VECTOR(SHL(C_MASK, L_MA(2 downto 0)));
-    C_MA    <= L_MA(XLEN - 1 downto 3) & "000";
-    C_MD    <= STD_LOGIC_VECTOR(SHL(L_MD, STD_LOGIC_VECTOR(TO_SIGNED(8*(TO_INTEGER(unsigned(L_MA(2 downto 0)))),XLEN)))) when L_MA(2 downto 0) /= "000" else L_MD;
+	C_SMASK <= STD_LOGIC_VECTOR(SHL(C_MASK, L_MA(2 downto 0)));
+	C_MA    <= L_MA(XLEN - 1 downto 3) & "000";
+	C_MD    <= STD_LOGIC_VECTOR(SHL(L_MD, STD_LOGIC_VECTOR(TO_SIGNED(8*(TO_INTEGER(unsigned(L_MA(2 downto 0)))), XLEN))));
 	C_MRDY  <= I_MRDY;
 	C_MIN   <= I_MIN;
+
+	process(I_CLK)
+	begin
+		if (falling_edge(I_CLK)) then
+			L_SDOUT <= STD_LOGIC_VECTOR(SHR(C_DOUT, STD_LOGIC_VECTOR(TO_SIGNED(8*(TO_INTEGER(unsigned(L_MA(2 downto 0)))), XLEN))));
+		end if;
+	end process;
+
+	with L_CS(CS_FC'range) select L_DOUT <=
+		(XLEN - 1 downto 8 => L_SDOUT(7)) & L_SDOUT(7 downto 0) when "000", -- LB
+		(XLEN - 1 downto 16 => L_SDOUT(15)) & L_SDOUT(15 downto 0) when "001", -- LH
+		(XLEN - 1 downto 32 => L_SDOUT(31)) & L_SDOUT(31 downto 0) when "010", -- LW
+		L_SDOUT(XLEN - 1 downto 0) when "011", -- LD
+		(XLEN - 1 downto 8 => '0') & L_SDOUT(7 downto 0) when "100", -- LBU
+		(XLEN - 1 downto 16 => '0') & L_SDOUT(15 downto 0) when "101", -- LHU
+		(XLEN - 1 downto 32 => '0') & L_SDOUT(31 downto 0) when "110", -- LWU
+		(others => '0') when others;
+
+	with L_CS(CS_WB'range) select Q_WB <=
+		L_PC + "100" when "01",         -- PC + 4
+		L_DOUT when "10",               -- MEM
+		L_MD when "11",                 -- CSR
+		L_MA when others;               -- ALU
 
 	Q_STALL <= not C_RDY;
 	Q_CS    <= (others => '0') when C_RDY = '0' else L_CS;

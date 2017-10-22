@@ -32,8 +32,8 @@ architecture RTL of registerfile is
 		);
 	end component reg;
 
-	signal L_WRITE  : std_logic_vector(31 downto 0)       := X"00000000";
-	signal L_WRITES : std_logic_vector(31 downto 0)       := X"00000000";
+	signal L_WRITE  : std_logic_vector(31 downto 0);
+	signal L_WRITES : std_logic_vector(31 downto 0);
 	signal L_R1     : std_logic_vector(XLEN - 1 downto 0);
 	signal L_R2     : std_logic_vector(XLEN - 1 downto 0);
 	signal L_R3     : std_logic_vector(XLEN - 1 downto 0);
@@ -477,8 +477,7 @@ begin
 		L_R28 when "11100",
 		L_R29 when "11101",
 		L_R30 when "11110",
-		L_R31 when "11111",
-		(others => '0') when others;
+		L_R31 when "11111",(others => '0') when others;
 
 	with I_RS2 select L_RD2 <=
 		L_R1 when "00001",
@@ -511,8 +510,7 @@ begin
 		L_R28 when "11100",
 		L_R29 when "11101",
 		L_R30 when "11110",
-		L_R31 when "11111",
-		(others => '0') when others;
+		L_R31 when "11111",(others => '0') when others;
 
 	Q_RD1 <= I_WD when (I_WA = I_RS1 and I_WE = '1') else L_RD1;
 	Q_RD2 <= I_WD when (I_WA = I_RS2 and I_WE = '1') else L_RD2;

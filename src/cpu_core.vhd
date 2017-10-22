@@ -272,6 +272,7 @@ begin
 	L_KILLIF <= L_SELT or EX_KILL;
 	L_KILLID <= L_SELT or EX_KILL;
 	L_KILLEX <= EX_KILL;
+	L_KILLMA <= '0';
 
 	Q_MMASK <= MA_MMASK;
 	Q_MOUT  <= MA_MOUT;
