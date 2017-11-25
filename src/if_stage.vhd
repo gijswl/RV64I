@@ -68,7 +68,7 @@ begin
 			ADR_WIDTH   => XLEN,
 			DATA_WIDTH  => 32,
 			CACHE_LINES => 2048,
-			DATA_FILE   => "C:\Users\Gijs\workspaceSigasi\RV64-priv\instr_cache.txt"
+			DATA_FILE   => "instr_cache.txt"
 		)
 		port map(
 			I_CLK  => I_CLK,

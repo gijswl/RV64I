@@ -112,7 +112,7 @@ begin
 			ADR_WIDTH  => 64,
 			DATA_WIDTH => 64,
 			RAM_SIZE   => 64,
-			DATA_FILE  => "C:\Users\Gijs\workspaceSigasi\RV64-priv\ram.txt"
+			DATA_FILE  => "ram.txt"
 		)
 		port map(
 			I_CLK   => L_CLK,

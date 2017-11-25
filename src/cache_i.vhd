@@ -5,6 +5,8 @@ use ieee.numeric_std.all;
 use std.textio.all;
 use ieee.std_logic_textio.all;
 
+library work;
+
 -- TODO make cache act like a cache
 entity cache_i is
 	generic(
