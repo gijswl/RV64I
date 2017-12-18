@@ -85,7 +85,7 @@ begin
 		if (I_RST = '1') then
 			L_STATE <= "00";
 			L_CORE  <= '0';
-		elsif (falling_edge(I_CLK)) then
+		elsif (rising_edge(I_CLK)) then
 			case L_STATE is
 				when "00" =>
 					C0_MRDY <= '0';
@@ -131,6 +131,7 @@ begin
 					end if;
 				when "01" =>
 					if (L_CORE = '0') then
+						C0_MRDY <= '0';
 						if (I_ACK = '1') then
 							C0_MIN  <= I_DAT;
 							C0_MRDY <= '1';
@@ -151,8 +152,20 @@ begin
 					if (L_CORE = '0') then
 						C0_MRDY <= '0';
 					end if;
+					
+					if(C0_MRE = '1') then
+						L_ADR <= C0_MADDR;
+						L_WE  <= '0';
+						L_SEL <= C0_MMASK;
+						L_CYC <= '1';
+						L_STB <= '1';
 
-					L_STATE <= "00";
+						L_TGA <= '0';
+						L_TGC <= '0';
+						L_STATE <= "01";
+					else
+						L_STATE <= "00";
+					end if;
 				when "11" =>
 					if (L_CORE = '0') then
 						if (I_ACK = '1') then

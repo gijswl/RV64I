@@ -49,36 +49,28 @@ architecture RTL of ram is
 	signal L_MASK : std_logic_vector(DATA_WIDTH - 1 downto 0);
 	signal L_DATO : std_logic_vector(DATA_WIDTH - 1 downto 0);
 
-	type mem_t is array (0 to RAM_SIZE - 1) of std_logic_vector(DATA_WIDTH - 1 downto 0);
+	type mem_t is array (0 to RAM_SIZE - 1) of bit_vector(DATA_WIDTH - 1 downto 0);
 	signal mem : mem_t := (others => (others => '1'));
 begin
-	--	read_file : process(I_CLK)
-	--		variable V_LINE : line;
-	--		variable V_ADR  : natural;
-	--		variable V_DAT  : std_logic_vector(DATA_WIDTH - 1 downto 0);
-	--		variable V_SEP  : character;
-	--		variable V_DONE : std_logic := '1';
-	--	begin
-	--		if (I_RST = '1' and falling_edge(I_CLK)) then
-	--			V_DONE := '0';
-	--		end if;
-	--		if (V_DONE = '0') then
-	--			while not endfile(F_DATA) loop
-	--				readline(F_DATA, V_LINE);
-	--				read(V_LINE, V_ADR);
-	--				read(V_LINE, V_SEP);
-	--				read(V_LINE, V_DAT);
-	--
-	--				--mem(V_ADR) <= V_DAT;
-	--			end loop;
-	--			file_close(F_DATA);
-	--			V_DONE := '1';
-	--			report "Read ram data file" severity note;
-	--		end if;
-	--	end process;
-
 	process(I_CLK)
+		variable V_LINE : line;
+		variable V_ADR  : natural := 0;
+		variable V_DAT  : std_logic_vector(DATA_WIDTH - 1 downto 0);
+		variable V_DONE : std_logic := '0';
 	begin
+		if (V_DONE = '0') then
+			while not endfile(F_DATA) loop
+				readline(F_DATA, V_LINE);
+				hread(V_LINE, V_DAT);
+
+				mem(V_ADR) <= to_bitvector(V_DAT);
+				V_ADR      := V_ADR + 1;
+			end loop;
+			file_close(F_DATA);
+			V_DONE := '1';
+			report "Read ram data file" severity note;
+		end if;
+		
 		if (I_RST = '1') then
 			L_STATE <= "000";
 		elsif (rising_edge(I_CLK)) then
@@ -105,7 +97,7 @@ begin
 					end if;
 				end if;
 			elsif (L_STATE = "001") then
-				L_DATO <= mem(L_IADR) and L_MASK;
+				L_DATO <= to_stdlogicvector(mem(L_IADR)) and L_MASK;
 				L_TGD  <= '0';
 				L_ACK  <= '1';
 
@@ -123,7 +115,7 @@ begin
 					L_STATE <= "000";
 				end if;
 			elsif (L_STATE = "100") then
-				mem(L_IADR) <= (I_DAT and L_MASK) or (mem(L_IADR) and not L_MASK);
+				mem(L_IADR) <= to_bitvector((I_DAT and L_MASK) or (to_stdlogicvector(mem(L_IADR)) and not L_MASK));
 				L_ACK       <= '1';
 
 				L_STATE <= "011";

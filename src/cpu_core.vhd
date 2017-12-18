@@ -28,14 +28,24 @@ architecture RTL of cpu_core is
 			I_SELT   : in  std_logic;
 			I_STALL  : in  std_logic;
 			I_KILL   : in  std_logic;
+			I_MRDY   : in std_logic;
+			I_MIN    : in std_logic_vector(XLEN - 1 downto 0);
 			I_TARGET : in  std_logic_vector(XLEN - 1 downto 0);
+			Q_MMASK  : out std_logic_vector((XLEN / 8) - 1 downto 0);
 			Q_PC     : out std_logic_vector(XLEN - 1 downto 0);
-			Q_INSTR  : out std_logic_vector(32 downto 0)
+			Q_MADDR  : out std_logic_vector(XLEN - 1 downto 0);
+			Q_INSTR  : out std_logic_vector(32 downto 0);
+			Q_MRE    : out std_logic
 		);
 	end component if_stage;
 
 	signal IF_PC    : std_logic_vector(XLEN - 1 downto 0);
 	signal IF_INSTR : std_logic_vector(32 downto 0);
+	signal IF_MRDY  : std_logic;
+	signal IF_MRE   : std_logic;
+	signal IF_MIN   : std_logic_vector(XLEN - 1 downto 0);
+	signal IF_MADDR : std_logic_vector(XLEN - 1 downto 0);
+	signal IF_MMASK : std_logic_vector((XLEN / 8) - 1 downto 0);
 
 	component id_stage is
 		port(
@@ -156,6 +166,8 @@ architecture RTL of cpu_core is
 	signal L_KILLID : std_logic;
 	signal L_KILLEX : std_logic;
 	signal L_KILLMA : std_logic;
+	
+	signal A_CUR_MEM : std_logic_vector(1 downto 0);
 begin
 	stage_if : if_stage
 		port map(
@@ -164,9 +176,14 @@ begin
 			I_SELT   => L_SELT,
 			I_STALL  => L_STALL,
 			I_KILL   => L_KILLIF,
+			I_MRDY   => IF_MRDY,
+			I_MIN    => IF_MIN,
 			I_TARGET => L_PCTARGET,
+			Q_MMASK  => IF_MMASK,
 			Q_PC     => IF_PC,
-			Q_INSTR  => IF_INSTR
+			Q_MADDR  => IF_MADDR,
+			Q_INSTR  => IF_INSTR,
+			Q_MRE    => IF_MRE
 		);
 
 	stage_id : id_stage
@@ -243,6 +260,22 @@ begin
 			Q_WA    => WB_WA,
 			Q_WR    => WB_WR
 		);
+		
+	process(IF_MRE, MA_MRE, MA_MWE, I_MRDY, I_RST)
+	begin
+		if(falling_edge(I_MRDY) or I_RST = '1') then
+			if((A_CUR_MEM = "01" and IF_MRE = '1') or (A_CUR_MEM = "10" and (MA_MRE = '1' or MA_MWE = '1'))) then
+				
+			else
+				A_CUR_MEM <= "00";
+			end if;
+		end if;
+		if((MA_MRE = '1' or MA_MWE = '1') and A_CUR_MEM = "00") then
+			A_CUR_MEM <= "10";
+		elsif(IF_MRE = '1' and A_CUR_MEM = "00") then
+			A_CUR_MEM <= "01";
+		end if;
+	end process;
 
 	L_FW_A <= FW_EX when (
 			((L_FC(FC_RS1'range) = EX_CS(CS_RD'range)) and (EX_CS(CS_WE'range) = "1" and not (EX_CS(CS_RD'range) = "00000")) and L_FC(FC_RA'range) = "1")
@@ -266,7 +299,11 @@ begin
 		)
 		else FW_NO;
 
-	MA_MRDY <= I_MRDY;
+
+	IF_MRDY <= I_MRDY when A_CUR_MEM = "01" else '0';
+	MA_MRDY <= I_MRDY when A_CUR_MEM = "10" else '0';
+	
+	IF_MIN  <= I_MIN;
 	MA_MIN  <= I_MIN;
 
 	L_KILLIF <= L_SELT or EX_KILL;
@@ -274,9 +311,9 @@ begin
 	L_KILLEX <= EX_KILL;
 	L_KILLMA <= '0';
 
-	Q_MMASK <= MA_MMASK;
-	Q_MOUT  <= MA_MOUT;
-	Q_MADDR <= MA_MADDR;
-	Q_MWE   <= MA_MWE;
-	Q_MRE   <= MA_MRE;
+	Q_MMASK <= MA_MMASK when A_CUR_MEM = "10" else IF_MMASK when A_CUR_MEM = "01" else (others => 'Z');
+	Q_MOUT  <= MA_MOUT when A_CUR_MEM = "10" else (others => '0');
+	Q_MADDR <= MA_MADDR when A_CUR_MEM = "10" else IF_MADDR when A_CUR_MEM = "01" else (others => 'Z');
+	Q_MWE   <= MA_MWE when A_CUR_MEM = "10" else '0';
+	Q_MRE   <= MA_MRE when A_CUR_MEM = "10" else IF_MRE when A_CUR_MEM = "01" else '0';
 end architecture RTL;

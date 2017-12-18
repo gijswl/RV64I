@@ -6,7 +6,7 @@ use ieee.numeric_std.all;
 library work;
 use work.constants.all;
 
-entity if_stage is
+entity if_stage_old is
 	port(
 		I_CLK    : in  std_logic;
 		I_RST    : in  std_logic;
@@ -17,9 +17,9 @@ entity if_stage is
 		Q_PC     : out std_logic_vector(XLEN - 1 downto 0);
 		Q_INSTR  : out std_logic_vector(32 downto 0)
 	);
-end entity if_stage;
+end entity if_stage_old;
 
-architecture RTL of if_stage is
+architecture RTL of if_stage_old is
 	component reg is
 		generic(
 			width : natural

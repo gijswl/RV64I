@@ -1,63 +1,65 @@
 v 4
-file "/home/gijs/Development/VHDL/RV64I/" "src/wb_stage.vhd" "474bb5caafbaa826da7e784fd33e18ab78026319" "20171125140234.637":
-  entity wb_stage at 1( 0) + 0 on 5023;
-  architecture rtl of wb_stage at 22( 509) + 0 on 5024;
-file "/home/gijs/Development/VHDL/RV64I/" "src/reg.vhd" "7e209433532e7c5cbbbc0dc393155166117929bd" "20171125140234.513":
-  entity reg at 1( 0) + 0 on 5019;
-  architecture rtl of reg at 21( 365) + 0 on 5020;
-file "/home/gijs/Development/VHDL/RV64I/" "src/registerfile.vhd" "bf0c41e2d1b4232f66d41b78b132bbf0ae6f98aa" "20171125140234.303":
-  entity registerfile at 1( 0) + 0 on 5015;
-  architecture rtl of registerfile at 22( 536) + 0 on 5016;
-file "/home/gijs/Development/VHDL/RV64I/" "src/itype_decoder.vhd" "6c108a96aab72722758af8fdd23b47f82f9b7eb6" "20171125140234.109":
-  entity itype_decoder at 1( 0) + 0 on 5011;
-  architecture rtl of itype_decoder at 12( 247) + 0 on 5012;
-file "/home/gijs/Development/VHDL/RV64I/" "src/id_stage.vhd" "ef48daeb6d6ddad2d0dd32e91c7425b9759fd7ec" "20171125140233.923":
-  entity id_stage at 1( 0) + 0 on 5007;
-  architecture rtl of id_stage at 29( 851) + 0 on 5008;
-file "/home/gijs/Development/VHDL/RV64I/" "src/d_cache.vhd" "e98b24de29cba1c85a7c42272c806df56fe359d2" "20171125140233.772":
-  entity d_cache at 1( 0) + 0 on 5003;
-  architecture rtl of d_cache at 27( 647) + 0 on 5004;
-file "/home/gijs/Development/VHDL/RV64I/" "src/cpu_core.vhd" "8a2add28793314ed27e0eb2299a9cef36979f694" "20171125140233.627":
-  entity cpu_core at 1( 0) + 0 on 4999;
-  architecture rtl of cpu_core at 23( 546) + 0 on 5000;
-file "/home/gijs/Development/VHDL/RV64I/" "src/alu.vhd" "f78d08970b6448944451f07dc13842fef4d7c51f" "20171125140233.514":
-  entity alu at 1( 0) + 0 on 4995;
-  architecture rtl of alu at 21( 487) + 0 on 4996;
-file "/home/gijs/Development/VHDL/RV64I/" "test/testbench.vhd" "9f0045c528e5fca4a4753afdb39446f095607d2a" "20171125140233.454":
-  entity testbench at 1( 0) + 0 on 4991;
-  architecture rtl of testbench at 8( 113) + 0 on 4992;
-file "/home/gijs/Development/VHDL/RV64I/" "test/ram.vhd" "be02c0b4459906ee381dd4bf36b9d9a23be80e12" "20171125140233.354":
-  entity ram at 1( 0) + 0 on 4987;
-  architecture rtl of ram at 37( 967) + 0 on 4988;
+file "/home/gijs/Development/VHDL/RV64I/" "src/if_stage.vhd" "a7ab661c1b3485c2f4ce8f0f065c7af5df9d8d79" "20171216175716.799":
+  entity if_stage_old at 1( 0) + 0 on 9335;
+  architecture rtl of if_stage_old at 22( 497) + 0 on 9336;
+file "/home/gijs/Development/VHDL/RV64I/" "src/cache_i.vhd" "772a1cb2b469d25a98804a0a487c80157e885300" "20171216175716.154":
+  entity cache_i at 1( 0) + 0 on 9321;
+  architecture rtl of cache_i at 25( 507) + 0 on 9322;
+file "/home/gijs/Development/VHDL/RV64I/" "src/system_handler.vhd" "8be9c04c63ab414da8cee7e1ecbc5140d9dd64a5" "20171216175717.302":
+  entity system_handler at 1( 0) + 0 on 9347;
+  architecture rtl of system_handler at 34( 1016) + 0 on 9348;
+file "/home/gijs/Development/VHDL/RV64I/" "src/reg_rst.vhd" "ae5a0e96b88dba87883d04e902fdba1ce987f274" "20171216175717.248":
+  entity reg_rst at 1( 0) + 0 on 9343;
+  architecture rtl of reg_rst at 22( 402) + 0 on 9344;
+file "/home/gijs/Development/VHDL/RV64I/" "src/ma_stage.vhd" "72d8a6b7c3d653164ea7444bbd1d441d7016b300" "20171216175716.939":
+  entity ma_stage at 1( 0) + 0 on 9339;
+  architecture rtl of ma_stage at 30( 897) + 0 on 9340;
+file "/home/gijs/Development/VHDL/RV64I/" "src/ex_stage.vhd" "78474144948819450ce96b2ff1de9b56974a3abc" "20171216175716.424":
+  entity ex_stage at 1( 0) + 0 on 9329;
+  architecture rtl of ex_stage at 34( 1142) + 0 on 9330;
+file "/home/gijs/Development/VHDL/RV64I/" "src/cpu_top.vhd" "63cc42f7a05bade6001a72ed2081f2489ff5b574" "20171216175716.308":
+  entity cpu_top at 1( 0) + 0 on 9325;
+  architecture rtl of cpu_top at 31( 786) + 0 on 9326;
+file "/home/gijs/Development/VHDL/RV64I/" "src/0constants.vhd" "50b905baa653bc6eb654acd2cea268ed826b61e5" "20171216175716.037":
+  package constants at 1( 0) + 0 on 9318;
+file "/home/gijs/Development/VHDL/RV64I/" "test/syscon.vhd" "478a9f6961a8485f1ddb557b3e6e475ea5e27e35" "20171216175715.977":
+  entity syscon at 1( 0) + 0 on 9314;
+  architecture rtl of syscon at 12( 167) + 0 on 9315;
+file "/home/gijs/Development/VHDL/RV64I/" "test/cache.vhd" "806042316f4256ec1c7d4f874ae38efd2f46f7ad" "20171216175715.593":
+  entity cache at 1( 0) + 0 on 9310;
+  architecture cache_arch of cache at 41( 1380) + 0 on 9311;
 file "C:\Users\Gijs\workspaceSigasi\RV64-priv\" "src/cache.vhd" "09ea583b7260d76062da2ff89e9e3575ce73d49d" "20170720072843.662":
   architecture rtl of cache at 23( 510) + 0 on 4640;
-file "/home/gijs/Development/VHDL/RV64I/" "test/cache.vhd" "806042316f4256ec1c7d4f874ae38efd2f46f7ad" "20171125140233.091":
-  entity cache at 1( 0) + 0 on 4985;
-  architecture cache_arch of cache at 41( 1380) + 0 on 4986;
-file "/home/gijs/Development/VHDL/RV64I/" "test/syscon.vhd" "478a9f6961a8485f1ddb557b3e6e475ea5e27e35" "20171125140233.433":
-  entity syscon at 1( 0) + 0 on 4989;
-  architecture rtl of syscon at 12( 167) + 0 on 4990;
-file "/home/gijs/Development/VHDL/RV64I/" "src/0constants.vhd" "0d22a9ce053d8999fb9661aeace721ed186dea59" "20171125140233.486":
-  package constants at 1( 0) + 0 on 4993;
-  package body constants at 104( 5928) + 0 on 4994;
-file "/home/gijs/Development/VHDL/RV64I/" "src/cpu_top.vhd" "38d6cd4c7f6b96b9e8214f77820e62c36e0086f8" "20171125140233.710":
-  entity cpu_top at 1( 0) + 0 on 5001;
-  architecture rtl of cpu_top at 31( 786) + 0 on 5002;
-file "/home/gijs/Development/VHDL/RV64I/" "src/ex_stage.vhd" "78474144948819450ce96b2ff1de9b56974a3abc" "20171125140233.811":
-  entity ex_stage at 1( 0) + 0 on 5005;
-  architecture rtl of ex_stage at 34( 1142) + 0 on 5006;
-file "/home/gijs/Development/VHDL/RV64I/" "src/if_stage.vhd" "6678bfb97cfca4511888aabe95223b82217674da" "20171125140234.073":
-  entity if_stage at 1( 0) + 0 on 5009;
-  architecture rtl of if_stage at 22( 489) + 0 on 5010;
-file "/home/gijs/Development/VHDL/RV64I/" "src/ma_stage.vhd" "72d8a6b7c3d653164ea7444bbd1d441d7016b300" "20171125140234.201":
-  entity ma_stage at 1( 0) + 0 on 5013;
-  architecture rtl of ma_stage at 30( 897) + 0 on 5014;
-file "/home/gijs/Development/VHDL/RV64I/" "src/reg_rst.vhd" "ae5a0e96b88dba87883d04e902fdba1ce987f274" "20171125140234.488":
-  entity reg_rst at 1( 0) + 0 on 5017;
-  architecture rtl of reg_rst at 22( 402) + 0 on 5018;
-file "/home/gijs/Development/VHDL/RV64I/" "src/system_handler.vhd" "8be9c04c63ab414da8cee7e1ecbc5140d9dd64a5" "20171125140234.537":
-  entity system_handler at 1( 0) + 0 on 5021;
-  architecture rtl of system_handler at 34( 1016) + 0 on 5022;
-file "/home/gijs/Development/VHDL/RV64I/" "src/cache_i.vhd" "772a1cb2b469d25a98804a0a487c80157e885300" "20171125140233.592":
-  entity cache_i at 1( 0) + 0 on 4997;
-  architecture rtl of cache_i at 25( 507) + 0 on 4998;
+file "/home/gijs/Development/VHDL/RV64I/" "test/ram.vhd" "11975a14e5936ce5174af39eccad4a41e825b18d" "20171216175715.883":
+  entity ram at 1( 0) + 0 on 9312;
+  architecture rtl of ram at 37( 967) + 0 on 9313;
+file "/home/gijs/Development/VHDL/RV64I/" "test/testbench.vhd" "a842f7c4dd8bb5c820370b298e43cdc56c37384f" "20171216175716.001":
+  entity testbench at 1( 0) + 0 on 9316;
+  architecture rtl of testbench at 8( 113) + 0 on 9317;
+file "/home/gijs/Development/VHDL/RV64I/" "src/alu.vhd" "f78d08970b6448944451f07dc13842fef4d7c51f" "20171216175716.068":
+  entity alu at 1( 0) + 0 on 9319;
+  architecture rtl of alu at 21( 487) + 0 on 9320;
+file "/home/gijs/Development/VHDL/RV64I/" "src/cpu_core.vhd" "39c196ec82ede59af2b875df8a1773a0d6abb89a" "20171216175716.193":
+  entity cpu_core at 1( 0) + 0 on 9323;
+  architecture rtl of cpu_core at 23( 546) + 0 on 9324;
+file "/home/gijs/Development/VHDL/RV64I/" "src/d_cache.vhd" "e98b24de29cba1c85a7c42272c806df56fe359d2" "20171216175716.381":
+  entity d_cache at 1( 0) + 0 on 9327;
+  architecture rtl of d_cache at 27( 647) + 0 on 9328;
+file "/home/gijs/Development/VHDL/RV64I/" "src/id_stage.vhd" "ef48daeb6d6ddad2d0dd32e91c7425b9759fd7ec" "20171216175716.561":
+  entity id_stage at 1( 0) + 0 on 9331;
+  architecture rtl of id_stage at 29( 851) + 0 on 9332;
+file "/home/gijs/Development/VHDL/RV64I/" "src/itype_decoder.vhd" "6c108a96aab72722758af8fdd23b47f82f9b7eb6" "20171216175716.840":
+  entity itype_decoder at 1( 0) + 0 on 9337;
+  architecture rtl of itype_decoder at 12( 247) + 0 on 9338;
+file "/home/gijs/Development/VHDL/RV64I/" "src/registerfile.vhd" "bf0c41e2d1b4232f66d41b78b132bbf0ae6f98aa" "20171216175717.050":
+  entity registerfile at 1( 0) + 0 on 9341;
+  architecture rtl of registerfile at 22( 536) + 0 on 9342;
+file "/home/gijs/Development/VHDL/RV64I/" "src/reg.vhd" "7e209433532e7c5cbbbc0dc393155166117929bd" "20171216175717.275":
+  entity reg at 1( 0) + 0 on 9345;
+  architecture rtl of reg at 21( 365) + 0 on 9346;
+file "/home/gijs/Development/VHDL/RV64I/" "src/wb_stage.vhd" "474bb5caafbaa826da7e784fd33e18ab78026319" "20171216175717.412":
+  entity wb_stage at 1( 0) + 0 on 9349;
+  architecture rtl of wb_stage at 22( 509) + 0 on 9350;
+file "/home/gijs/Development/VHDL/RV64I/" "src/if_stage_new.vhd" "75948bd3b0ac2d02774580a5d3e7156e484eaf3f" "20171216175716.730":
+  entity if_stage at 1( 0) + 0 on 9333;
+  architecture rtl of if_stage at 27( 711) + 0 on 9334;

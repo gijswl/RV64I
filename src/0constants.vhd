@@ -100,6 +100,3 @@ package constants is
 	constant MCAUSE_LPAGE_FAULT      : std_logic_vector(XLEN - 1 downto 0) := X"000000000000000D";
 	constant MCAUSE_SPAGE_FAULT      : std_logic_vector(XLEN - 1 downto 0) := X"000000000000000F";
 end package constants;
-
-package body constants is
-end package body;

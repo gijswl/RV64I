@@ -111,7 +111,7 @@ begin
 		generic map(
 			ADR_WIDTH  => 64,
 			DATA_WIDTH => 64,
-			RAM_SIZE   => 64,
+			RAM_SIZE   => 128,
 			DATA_FILE  => "ram.txt"
 		)
 		port map(
